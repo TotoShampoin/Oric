@@ -10,6 +10,7 @@ void AdvancedPrint(int,int,char*);
 void APlot(int,int,char,int);
 short rand124();
 void delai(char i);
+void CG_DEFCHAR();
 
 //Variables
 short grid[MAX_X][MAX_Y];
@@ -309,6 +310,8 @@ void main()
 	cls();
 	AdvancedPrint(2,10,"Appuyez sur une touche");
 	get();
+	
+	CG_DEFCHAR();
 	poke(0x26A,10);
 	ticks = deek(0x276);
 	srandom(ticks);
