@@ -5,4 +5,4 @@
 ::
 SET OSDKADDR=$1000
 SET OSDKNAME=BEJEWELED
-SET OSDKFILE=main print prim CHAR
+SET OSDKFILE=main print prim CHAR procasm

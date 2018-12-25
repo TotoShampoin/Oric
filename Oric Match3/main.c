@@ -9,6 +9,7 @@
 void AdvancedPrint(int,int,char*);
 void APlot(int,int,char,int);
 short rand124();
+void delai(char i);
 
 //Variables
 short grid[MAX_X][MAX_Y];
@@ -24,6 +25,7 @@ short selx,sely,difx,dify, perx,pery, temp0,select, permut;
 
 int tpx, tpy;
 int calc1, calc2;
+int iwait;
 
 unsigned int compteur=0;
 char *aff  ="        ";
@@ -87,8 +89,9 @@ void effcurs(int pltx,int plty)
 void checkplot(scr)
 {
 	short a, x, y, align;
+	int scoretmp=0;
 	
-	memset(grid2,0,MAX_X*MAX_Y);
+	for(x=0;x<8;x++)for(y=0;y<8;y++) grid2[x][y]=0;
 	
 	for(y=0;y<MAX_Y;y++)
 	{
@@ -102,9 +105,7 @@ void checkplot(scr)
 					for(a=1;a<=align;a++){
 						grid2[x-a][y]=1;
 					}
-					if(scr==1){
-						score += align;
-					}	
+					scoretmp += align;
 				}
 				align=1;
 			}
@@ -114,8 +115,7 @@ void checkplot(scr)
 		{
 			for(a=1;a<=align;a++)
 				{grid2[x-a][y]=1;}
-			if(scr==1)
-				{score += align;}
+			scoretmp += align;
 		}
 
 	}
@@ -130,9 +130,7 @@ void checkplot(scr)
 				if(align>=MINIMAL){
 					for(a=1;a<=align;a++)
 						{grid2[x][y-a]=1;}
-					if(scr==1){
-						score += align;
-					}
+					scoretmp += align;
 				}
 				align=1;
 			}
@@ -142,41 +140,78 @@ void checkplot(scr)
 		{
 			for(a=1;a<=align;a++)
 				{grid2[x][y-a]=1;}
-			if(scr==1)
-				{score += align;}
+			scoretmp += align;
 		}
 
 	}
-
-	for(x=0;x<MAX_X;x++)
-	{
-		for(y=0;y<MAX_Y;y++)
-		{
-			if(grid2[x][y]==1)
-			{
-				if(select==1||permut==1){
-					select=0;
-					permut=0;
-					plout( selx , sely  , grid[selx][sely] , 0 );
+	if(scoretmp>0){
+		if(select==1||permut==1){
+			select=0;
+			permut=0;
+			plout( selx , sely  , grid[selx][sely] , 0 );
+			plout( px , py  , grid[px][py] , 0 );
+		}	
+		moveok = 1;
+		if(scr){
+			score += scoretmp;
+		}
+		//clignotement
+		for(x=0;x<MAX_X;x++){
+			for(y=0;y<MAX_Y;y++){
+				if(grid2[x][y]==1){
+					plout(x,y,0,0);
 				}
-				grid[x][y]=0; 
-				plout(x,y,0,0);
-				moveok = 1;
 			}
 		}
-	}
-	if(permut==1){
-		temp0 = grid[perx][pery];
-		grid[px][py] = grid[selx][sely]; 
-		plout( px , py  , grid[px][py] , 1 );
-		grid[selx][sely] = temp0;
-		plout( selx , sely  , grid[selx][sely] , 1 );
-		moveok = 1;
-	}
-	if(select==1){
-		plout( selx , sely  , grid[selx][sely] , 1 );
+		delai(50);
+		for(x=0;x<MAX_X;x++){
+			for(y=0;y<MAX_Y;y++){
+				if(grid2[x][y]==1){
+					plout(x,y,grid[x][y],0);
+				}
+			}
+		}
+		delai(50);
+		for(x=0;x<MAX_X;x++){
+			for(y=0;y<MAX_Y;y++){
+				if(grid2[x][y]==1){
+					plout(x,y,0,0);
+				}
+			}
+		}
+		delai(50);
+		for(x=0;x<MAX_X;x++){
+			for(y=0;y<MAX_Y;y++){
+				if(grid2[x][y]==1){
+					plout(x,y,grid[x][y],0);
+				}
+			}
+		}
+		delai(50);
+		for(x=0;x<MAX_X;x++){
+			for(y=0;y<MAX_Y;y++){
+				if(grid2[x][y]==1){
+					grid[x][y]=0; 
+					plout(x,y,0,0);
+				}
+			}
+		}
+	} else {
+		if(permut==1){
+			temp0 = grid[px][py];
+			grid[px][py] = grid[selx][sely]; 
+			plout( px , py  , grid[px][py] , 0 );
+			grid[selx][sely] = temp0;
+			plout( selx , sely  , grid[selx][sely] , 0 );
+			moveok = 0;
+			permut=0;
+		}
+		if(select==1){
+			plout( selx , sely  , grid[selx][sely] , 1 );
+		}
 	}
 	nop();
+	
 }
 
 void fil()
@@ -202,6 +237,10 @@ void fil()
 				grid[x][z]=0;
 			}
 		}
+	}
+	if(moveok ==1){
+		plout( selx , sely  , grid[selx][sely] , 0 );
+		plout( px , py  , grid[px][py] , 0 );
 	}
 	nop();
 }
@@ -239,9 +278,18 @@ void control(){
 				permut = 1;
 				temp0 = grid[px][py];
 				grid[px][py] = grid[selx][sely]; 
-				plout( px , py  , grid[px][py] , 1 );
 				grid[selx][sely] = temp0;
-				plout( selx , sely  , grid[selx][sely] , 1 );
+				plout( px , py  , 0 , 0 );
+				plout( selx , sely  , 0 , 0 );
+				delai(80);
+				plout( px , py  , grid[px][py] , 0 );
+				plout( selx , sely  , grid[selx][sely] , 0 );
+				delai(80);
+				plout( px , py  , grid[selx][sely] , 0 );
+				plout( selx , sely  , grid[px][py] , 0 );
+				delai(80);
+				plout( px , py  , grid[px][py] , 0 );
+				plout( selx , sely  , grid[selx][sely] , 0 );
 			} else {
 				plout( selx , sely  , grid[selx][sely] , 0 );
 			}
