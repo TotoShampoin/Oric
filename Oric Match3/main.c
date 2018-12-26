@@ -17,7 +17,7 @@ short grid[MAX_X][MAX_Y];
 short grid2[MAX_X][MAX_Y];
 
 short pos[2] = {0,0};		// x, y
-int score;
+char score[] = "00000000";
 
 short px,py;
 
@@ -86,6 +86,44 @@ void effcurs(int pltx,int plty)
 	nop();
 }
 
+void majscore(int sc)
+{
+	int l,m,n;
+	int scrtmp;
+	int retenue;
+	char *sctmp;
+	
+	m=0;n=0;
+	scrtmp = (sc*sc) ; //valeur ASC de 0 : 48
+	sctmp = itoa(scrtmp);
+	retenue = 0;
+	l=7;
+	for(n = strlen(sctmp)-1;n>=0;n--){
+		score[l] = score[l] + *(sctmp+n)- 48 + retenue;
+		if(score[l] > 57){
+			retenue = 1;
+			score[l] = score[l]-10;
+		}else{
+			retenue = 0;
+		}
+		l--;
+	}
+	while(retenue == 1 && l>=0){
+		score[l] = score[l] + retenue;
+		if(score[l] > 57){
+			retenue = 1;
+			score[l] = score[l]-10;
+		}else{
+			retenue = 0;
+		}
+		l--;
+	}
+		
+	APlot(31,6,5,1);
+	AdvancedPrint(32,6,"        ");
+	AdvancedPrint(32,6,score);
+	nop();
+}
 //Gestion de la grille
 void checkplot(scr)
 {
@@ -154,7 +192,7 @@ void checkplot(scr)
 		}	
 		moveok = 1;
 		if(scr){
-			score += scoretmp;
+			majscore(scoretmp);
 		}
 		//clignotement
 		for(x=0;x<MAX_X;x++){
@@ -325,10 +363,11 @@ void main()
 		poke(p,16); poke(p+1,7);
 		p=p+40;
 	}
+	fil();
 	while(1){
 		do{
 			moveok=0;
-			checkplot(0);
+			checkplot(1);
 			fil();
 		}while(moveok);
 		control();
