@@ -4,7 +4,7 @@ _CG_DEFCHAR
 	sta tmp0
 	lda #>_CG_DATA
 	sta tmp0+1
-	lda #$D0
+	lda #$D8
 	sta tmp1
 	lda #$B6
 	sta tmp1+1
@@ -17,6 +17,7 @@ boucle2
 	cpy #0
 	bne boucle2
 	
+;;;;;
 
 	lda #<_CG_DAT2
 	sta tmp0
@@ -34,7 +35,9 @@ boucle3
 	sta (tmp1),y
 	cpy #0
 	bne boucle3
-	
+
+;;;;
+
 	lda #<_CG_DAT4
 	sta tmp0
 	lda #>_CG_DAT4
@@ -51,12 +54,66 @@ boucle4
 	sta (tmp1),y
 	cpy #0
 	bne boucle4
+;;;;
+
+	lda #<_CG_DAT5
+	sta tmp0
+	lda #>_CG_DAT5
+	sta tmp0+1
+	lda #$F0
+	sta tmp1
+	lda #$B7
+	sta tmp1+1
+		
+	ldy #8
+boucle5
+	dey
+	lda (tmp0),y
+	sta (tmp1),y
+	cpy #0
+	bne boucle5
+;;;;;
+	lda #<_CG_DAT6
+	sta tmp0
+	lda #>_CG_DAT6
+	sta tmp0+1
+	lda #$08
+	sta tmp1
+	lda #$BA
+	sta tmp1+1
+		
+	ldy #0
+boucle6
+	dey
+	lda (tmp0),y
+	sta (tmp1),y
+	cpy #0
+	bne boucle6
+
+;;;;;
+	lda #<_CG_DAT7
+	sta tmp0
+	lda #>_CG_DAT7
+	sta tmp0+1
+	lda #$08
+	sta tmp1
+	lda #$BB
+	sta tmp1+1
+		
+	ldy #16
+boucle7
+	dey
+	lda (tmp0),y
+	sta (tmp1),y
+	cpy #0
+	bne boucle7
+
 	rts
 .)
 
 _CG_DATA
 ;;; rien
-.byt 0,0,0,0,0,0,0,0
+;;;.byt 0,0,0,0,0,0,0,0
 .byt 0,0,0,0,0,0,0,0
 .byt 0,0,0,0,0,0,0,0
 .byt 0,0,0,0,0,0,0,0
@@ -124,3 +181,44 @@ _CG_DAT4
 .byt 23,23,11,11,5,2,1,0	
 .byt 63,63,63,63,63,30,33,30	
 .byt 58,58,52,52,40,16,32,0
+
+_CG_DAT5
+.byt 30,63,63,30,30,12,12,0
+
+_CG_DAT6
+.byt 0,1,7,15,15,31,30,30
+.byt 0,32,56,60,60,62,30,30
+.byt 0,62,62,62,62,0,0,0
+.byt 0,31,31,31,31,0,0,0
+.byt 0,31,31,31,31,30,30,30
+.byt 0,62,62,62,62,30,30,30
+.byt 0,3,7,15,31,16,30,30
+.byt 0,63,63,63,63,0,63,63
+.byt 0,48,56,60,62,2,30,30
+.byt 30,30,31,15,15,7,1,0
+.byt 30,30,62,60,60,56,32,0
+.byt 0,0,0,62,62,62,62,0
+.byt 0,0,0,31,31,31,31,0
+.byt 30,30,31,31,31,31,31,0
+.byt 30,30,62,62,62,62,62,0
+.byt 30,31,15,15,15,7,7,7
+.byt 63,30,30,30,30,30,30,30
+.byt 30,62,60,60,60,56,56,56
+.byt 30,30,30,30,30,30,31,31
+.byt 30,30,30,30,30,30,62,62
+.byt 30,30,30,30,30,30,30,0
+.byt 0,30,30,30,30,30,30,30
+.byt 0,63,63,63,63,30,30,30
+.byt 30,30,63,63,63,63,63,0
+.byt 3,3,3,1,1,1,0,0
+.byt 45,45,45,45,45,45,45,51
+.byt 48,48,48,32,32,32,0,0
+.byt 31,31,30,30,30,30,30,0
+.byt 62,62,30,30,30,30,30,30
+.byt 0,63,63,63,63,0,0,0
+.byt 30,30,30,30,30,30,30,30
+.byt 63,63,0,0,0,0,0,0
+
+_CG_DAT7
+.byt 0,0,0,0,0,0,63,63
+.byt 51,18,18,18,12,12,12,0
