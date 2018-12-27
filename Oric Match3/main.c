@@ -17,7 +17,7 @@ short grid[MAX_X][MAX_Y];
 short grid2[MAX_X][MAX_Y];
 
 short pos[2] = {0,0};		// x, y
-char score[] = "00000000";
+char score[] = "0000000";
 
 short px,py;
 
@@ -26,7 +26,8 @@ short selx,sely,difx,dify, perx,pery, temp0,select, permut;
 
 int tpx, tpy;
 int calc1, calc2;
-int iwait,contpartie;
+int iwait,contpartie,newgame;
+char kr;
 
 unsigned int compteur=0;
 char *aff  ="        ";
@@ -63,6 +64,43 @@ void plout(int pltx,int plty,int gem,int inv)
 		APlot(tpx  ,tpy+1,gem,1); APlot(tpx+1,tpy+1,92+ge4,1); APlot(tpx+2,tpy+1,93+ge4,1);
 	}
 	nop();
+}
+
+void accueil()
+{
+	int p,y,qsd;
+	cls();
+	
+	p=0xBB80;
+	for(y=0;y<14;y++)
+	{
+		poke(p,16); poke(p+1,7);poke(p+2,9);
+		p=p+40;
+	}
+	for(y=14;y<28;y++)
+	{
+		poke(p,16); poke(p+1,7);
+		p=p+40;
+	}
+	AdvancedPrint(5,1,"A$B   E$B   ");
+	
+	for(qsd = 3;qsd<40;qsd++){
+		APlot(qsd,14 ,'"',1);
+	}
+	AdvancedPrint(3,16,"UTILISER LES FLECHES POUR SE DEPLACER");
+	AdvancedPrint(3,18,"       ESPACE POUR PERMUTER");
+	AdvancedPrint(3,20,"   ESCAPE SI PAS DE SOLUTION : FIN ");
+	AdvancedPrint(3,22,"  APPUYEZ SUR UNE TOUCHE POUR JOUER");
+	AdvancedPrint(3,24,"     Q POUR QUITTER MAINTENANT");
+		
+	kr=get();
+	if(kr=='Q'){
+		newgame=0;
+	} else {
+		newgame=1;
+	}
+	nop();
+	
 }
 
 void afftour()
@@ -110,12 +148,21 @@ void effcurs(int pltx,int plty)
 
 void afftheend(int zto)
 {
-	tpx = 3+10*3; 
-	tpy = 2+5*3;
+	tpx = 4+10*3; 
+	tpy = 2+6*3;
 	APlot(tpx  ,tpy  ,zto,1); AdvancedPrint(tpx+1,tpy  ,"*+,");
 	APlot(tpx  ,tpy+1,zto,1); AdvancedPrint(tpx+1,tpy+1,"-./");
 	APlot(tpx  ,tpy+2,zto,1); AdvancedPrint(tpx+1,tpy+2,"<=>");
-	APlot(31  ,tpy+4,7,1); AdvancedPrint(32,tpy+4," ESC  O");
+	APlot(31  ,tpy+4,7,1); AdvancedPrint(34,tpy+4,"ESC O");
+	nop();
+}
+
+void afftitre()
+{
+	APlot(31  ,2  ,7,1); APlot(32  ,2  ,10,1); AdvancedPrint(33,2  ," ORIC"); APlot(38  ,2  ,6,1); APlot(39  ,2  ,126,1);
+	APlot(31  ,3  ,7,1); APlot(32  ,3  ,10,1); AdvancedPrint(33,3  ," ORIC"); APlot(38  ,3  ,6,1); APlot(39  ,3  ,126,1);
+	APlot(31  ,4  ,7,1); APlot(32  ,4  ,10,1); AdvancedPrint(33,4  ," JEWEL ");
+	APlot(31  ,5  ,7,1); APlot(32  ,5  ,10,1); AdvancedPrint(33,5  ," JEWEL ");
 	nop();
 }
 
@@ -130,7 +177,7 @@ void majscore(int sc)
 	scrtmp = (sc*sc) ; //valeur ASC de 0 : 48
 	sctmp = itoa(scrtmp);
 	retenue = 0;
-	l=7;
+	l=6;
 	for(n = strlen(sctmp)-1;n>=0;n--){
 		score[l] = score[l] + *(sctmp+n)- 48 + retenue;
 		if(score[l] > 57){
@@ -152,11 +199,16 @@ void majscore(int sc)
 		l--;
 	}
 		
-	APlot(31,6,5,1);
-	AdvancedPrint(32,6," SCORE  ");		
-	APlot(31,9,5,1);
-	AdvancedPrint(32,9,"        ");
-	AdvancedPrint(32,9,score);
+	APlot(31,8,5,1);
+	AdvancedPrint(33,8," SCORE  ");		
+	APlot(31,10,5,1);
+	APlot(31,11,5,1);	
+	APlot(32,10,10,1);
+	APlot(32,11,10,1);
+	AdvancedPrint(33,10,"       ");
+	AdvancedPrint(33,11,"       ");
+	AdvancedPrint(33,10,score);
+	AdvancedPrint(33,11,score);
 	nop();
 }
 //Gestion de la grille
@@ -394,13 +446,7 @@ void main()
 	int x, y, p, r;
 	unsigned short i;
 	int ticks;
-	int newgame,kr;
 	
-	cls();
-	AdvancedPrint(2,10,"Appuyez sur une touche");
-	get();
-	
-	CG_DEFCHAR();
 	sauv1 = peek(0x24E);
 	sauv2 = peek(0x24F);
 	sauv3 = peek(0xBB80+35);
@@ -408,10 +454,13 @@ void main()
 	poke(0x24E,8);
 	poke(0x24F,6);
 	poke(0xBB80+35,0);
+	cls();	
+	CG_DEFCHAR();
+	accueil();
+
 	ticks = deek(0x276);
 	srandom(ticks);
 
-	newgame = 1;
 	while(newgame){	
 		cls();
 		px=0;py=0;
@@ -423,6 +472,7 @@ void main()
 			poke(p,16); poke(p+1,7);
 			p=p+40;
 		}
+		afftitre();
 		afftour();
 		afftheend(7);
 		fil();
@@ -436,19 +486,12 @@ void main()
 			control();
 			nop();
 		}
-		APlot(31,7,3,1);APlot(31,6,3,1);APlot(31,9,3,1);
-		AdvancedPrint(32,7, "  FINAL  ");	
-		AdvancedPrint(32,12,"  PRESS  ");	
-		AdvancedPrint(32,13,"   KEY   ");	
+		APlot(31,8,3,1);APlot(31,9,3,1);APlot(31,10,3,1);APlot(31,11,3,1);
+		AdvancedPrint(32,9, "  FINAL  ");	
+		AdvancedPrint(32,15," APPUYEZ ");	
+		AdvancedPrint(32,16,"1 TOUCHE ");	
 		get();
-		cls();
-		AdvancedPrint(6,4,"NOUVELLE PARTIE ?");
-		kr=get();
-		if(kr=='O'){
-			newgame = 1;
-		}else{
-			newgame = 0;
-		}
+		accueil();
 	}
 	cls();
 	poke(0x26A,3);
