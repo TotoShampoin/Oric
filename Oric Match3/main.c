@@ -26,7 +26,7 @@ short selx,sely,difx,dify, perx,pery, temp0,select, permut;
 
 int tpx, tpy;
 int calc1, calc2;
-int iwait;
+int iwait,contpartie;
 
 unsigned int compteur=0;
 char *aff  ="        ";
@@ -43,6 +43,7 @@ void debug(char *s){
 		aff = itoa(compteur); 
 		AdvancedPrint(0,0,aff); 
 		AdvancedPrint(5,0,s); 
+		get();
 }
 
 //Affichage
@@ -64,14 +65,35 @@ void plout(int pltx,int plty,int gem,int inv)
 	nop();
 }
 
+void afftour()
+{
+	int qsd;
+	APlot(2  , 1  , '!' ,1 ); 
+	APlot(2  , 27 , '%' ,1 ); 
+	APlot(30 , 1  , '#' ,1 ); 
+	APlot(30 , 27 , '&' ,1 ); 
+	APlot(29 , 1  , 7   ,1 ); 
+	APlot(29 , 27 , 7   ,1 ); 
+	for(qsd = 2;qsd<27;qsd++){
+		APlot(2 ,qsd,'$',1);
+		APlot(29 , qsd  , 7   ,1 ); 
+		APlot(30,qsd,'$',1);
+	}
+	for(qsd = 3;qsd<30;qsd++){
+		APlot(qsd,1 ,'"',1);
+		APlot(qsd,27,'"',1);
+	}
+
+	nop();
+}
 void affcurs(int pltx,int plty)
 {
 	tpx = 4+pltx*3; 
 	tpy = 2+plty*3;
-	APlot(tpx   , tpy   , 43 ,1 ); 
-	APlot(tpx   , tpy+3 , 43 ,1 ); 
-	APlot(tpx+3 , tpy   , 43 ,1 ); 
-	APlot(tpx+3 , tpy+3 , 43 ,1 ); 
+	APlot(tpx   , tpy   , '!' ,1 ); 
+	APlot(tpx   , tpy+3 , '%' ,1 ); 
+	APlot(tpx+3 , tpy   , '#' ,1 ); 
+	APlot(tpx+3 , tpy+3 , '&' ,1 ); 
 	nop();
 }
 
@@ -83,6 +105,17 @@ void effcurs(int pltx,int plty)
 	APlot(tpx   , tpy+3 , 32 ,1 ); 
 	APlot(tpx+3 , tpy+3 , 32 ,1 ); 
 	APlot(tpx+3 , tpy   , 32 ,1 ); 
+	nop();
+}
+
+void afftheend(int zto)
+{
+	tpx = 3+10*3; 
+	tpy = 2+5*3;
+	APlot(tpx  ,tpy  ,zto,1); AdvancedPrint(tpx+1,tpy  ,"*+,");
+	APlot(tpx  ,tpy+1,zto,1); AdvancedPrint(tpx+1,tpy+1,"-./");
+	APlot(tpx  ,tpy+2,zto,1); AdvancedPrint(tpx+1,tpy+2,"<=>");
+	APlot(31  ,tpy+4,7,1); AdvancedPrint(32,tpy+4," ESC  O");
 	nop();
 }
 
@@ -120,16 +153,19 @@ void majscore(int sc)
 	}
 		
 	APlot(31,6,5,1);
-	AdvancedPrint(32,6,"        ");
-	AdvancedPrint(32,6,score);
+	AdvancedPrint(32,6," SCORE  ");		
+	APlot(31,9,5,1);
+	AdvancedPrint(32,9,"        ");
+	AdvancedPrint(32,9,score);
 	nop();
 }
 //Gestion de la grille
 void checkplot(scr)
 {
 	short a, x, y, align;
-	int scoretmp=0;
+	int scoretmp;
 	
+	scoretmp = 0;
 	for(x=0;x<8;x++)for(y=0;y<8;y++) grid2[x][y]=0;
 	
 	for(y=0;y<MAX_Y;y++)
@@ -262,7 +298,9 @@ void fil()
 		{
 			if(grid[x][0]==0)
 			{
-				grid[x][0]=rand124(); 
+				while(grid[x][0] == 0){
+					grid[x][0]=rand124(); 
+				}
 				plout(x,0,grid[x][0],0);
 				moveok = 1;
 			}
@@ -291,6 +329,17 @@ void control(){
 	if( k == 11 ) { 
 		py = py - 1;
 		if( py < 0 ) py = MAX_Y - 1 ;
+	} else 	if( k == 27 ) { 
+		afftheend(1);
+		k=get();
+		while( k!=27 && k!='O' && k!='N' ){
+			k=get();
+		}
+		if( k == 27 || k=='N' ){
+			afftheend(7);
+		} else {
+			contpartie = 0;
+		}
 	} else 	if( k == 10 ) { 
 		py = py + 1;
 		if( py >= MAX_Y ) py=0;
@@ -341,36 +390,69 @@ void control(){
 //Main
 void main()
 {
+	short sauv1,sauv2,sauv3;
 	int x, y, p, r;
 	unsigned short i;
 	int ticks;
+	int newgame,kr;
 	
 	cls();
 	AdvancedPrint(2,10,"Appuyez sur une touche");
 	get();
 	
 	CG_DEFCHAR();
+	sauv1 = peek(0x24E);
+	sauv2 = peek(0x24F);
+	sauv3 = peek(0xBB80+35);
 	poke(0x26A,10);
+	poke(0x24E,8);
+	poke(0x24F,6);
+	poke(0xBB80+35,0);
 	ticks = deek(0x276);
 	srandom(ticks);
+
+	newgame = 1;
+	while(newgame){	
+		cls();
+		px=0;py=0;
+		
+		memset(grid,0,64);
+		p=0xBB80;
+		for(y=0;y<28;y++)
+		{
+			poke(p,16); poke(p+1,7);
+			p=p+40;
+		}
+		afftour();
+		afftheend(7);
+		fil();
+		contpartie = 1;
+		while(contpartie){
+			do{
+				moveok=0;
+				checkplot(1);
+				fil();
+			}while(moveok);
+			control();
+			nop();
+		}
+		APlot(31,7,3,1);APlot(31,6,3,1);APlot(31,9,3,1);
+		AdvancedPrint(32,7, "  FINAL  ");	
+		AdvancedPrint(32,12,"  PRESS  ");	
+		AdvancedPrint(32,13,"   KEY   ");	
+		get();
+		cls();
+		AdvancedPrint(6,4,"NOUVELLE PARTIE ?");
+		kr=get();
+		if(kr=='O'){
+			newgame = 1;
+		}else{
+			newgame = 0;
+		}
+	}
 	cls();
-	px=0;py=0;
-	
-	memset(grid,0,64);
-	p=0xBB80;
-	for(y=0;y<28;y++)
-	{
-		poke(p,16); poke(p+1,7);
-		p=p+40;
-	}
-	fil();
-	while(1){
-		do{
-			moveok=0;
-			checkplot(1);
-			fil();
-		}while(moveok);
-		control();
-		nop();
-	}
+	poke(0x26A,3);
+	poke(0x24E,sauv1);
+	poke(0x24F,sauv2);
+	poke(0xBB80+35,sauv3);
 }
