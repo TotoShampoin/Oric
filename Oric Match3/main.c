@@ -465,6 +465,7 @@ void main()
 		cls();
 		px=0;py=0;
 		
+		for(i=0;i<7;i++)score[i]='0';
 		memset(grid,0,64);
 		p=0xBB80;
 		for(y=0;y<28;y++)
