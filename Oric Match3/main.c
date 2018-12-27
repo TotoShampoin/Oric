@@ -5,6 +5,9 @@
 #define MAX_Y		8
 #define MINIMAL 	3
 
+#define x0   9
+#define y0  2
+
 //Fonctions externes
 void AdvancedPrint(int,int,char*);
 void APlot(int,int,char,int);
@@ -82,8 +85,15 @@ void accueil()
 		poke(p,16); poke(p+1,7);
 		p=p+40;
 	}
-	AdvancedPrint(5,1,"A$B   E$B   ");
 	
+	 AdvancedPrint(3+x0,1+y0,"AaB EaB DYC AaB GHI");APlot(18+x0,1+y0,6,1);
+	 AdvancedPrint(3+x0,2+y0,"b b UdJ  b  b   QRS");APlot(18+x0,2+y0,6,1);
+	 AdvancedPrint(3+x0,3+y0,"b b  eT  b  b   [ ]");APlot(7 +x0,3+y0,95,1);APlot(18+x0,3+y0,6,1);APlot(20+x0,3+y0,92,1);
+	 AdvancedPrint(3+x0,4+y0,"KcL W W NZM KcL  f ");APlot(18+x0,4+y0,6,1);
+	 AdvancedPrint(3+x0,5+y0,"  X EaC X X EaC X  ");
+	 AdvancedPrint(3+x0,6+y0,"  b Ud^ b b Ud^ b  ");
+	 AdvancedPrint(3+x0,7+y0,"  b  eh bXb  eh b  ");APlot(7+x0,7+y0,95,1);APlot(15+x0,7+y0,95,1);
+	 AdvancedPrint(3+x0,8+y0,"KcL OcM OZP OcM OcM");
 	for(qsd = 3;qsd<40;qsd++){
 		APlot(qsd,14 ,'"',1);
 	}
@@ -159,12 +169,38 @@ void afftheend(int zto)
 
 void afftitre()
 {
-	APlot(31  ,2  ,7,1); APlot(32  ,2  ,10,1); AdvancedPrint(33,2  ," ORIC"); APlot(38  ,2  ,6,1); APlot(39  ,2  ,126,1);
-	APlot(31  ,3  ,7,1); APlot(32  ,3  ,10,1); AdvancedPrint(33,3  ," ORIC"); APlot(38  ,3  ,6,1); APlot(39  ,3  ,126,1);
-	APlot(31  ,4  ,7,1); APlot(32  ,4  ,10,1); AdvancedPrint(33,4  ," JEWEL ");
-	APlot(31  ,5  ,7,1); APlot(32  ,5  ,10,1); AdvancedPrint(33,5  ," JEWEL ");
+	APlot(31  ,4  ,7,1); /*APlot(32  ,2  ,10,1); */ AdvancedPrint(33,4  ," ORIC"); APlot(38  ,4  ,6,1); APlot(39  ,4  ,126,1);
+//	APlot(31  ,3  ,7,1); APlot(32  ,3  ,10,1); AdvancedPrint(33,3  ," ORIC"); APlot(38  ,3  ,6,1); APlot(39  ,3  ,126,1);
+	APlot(31  ,5  ,7,1); /*APlot(32  ,4  ,10,1); */ AdvancedPrint(33,5  ," JEWEL ");
+//	APlot(31  ,5  ,7,1); APlot(32  ,5  ,10,1); AdvancedPrint(33,5  ," JEWEL ");
 	nop();
 }
+
+void music1(){
+	music(1,2,12,0);
+	music(2,4,4,0);
+	music(3,4,7,0);
+	play(7,0,1,1024);
+	nop();
+}
+
+void music2(){
+	music(1,3,12,0);
+	music(2,5,4,0);
+	music(3,5,7,0);
+	play(7,0,1,1024);
+	nop();
+}
+
+void music3(){
+	music(1,4,12,0);
+	music(2,6,4,0);
+	music(3,5,7,0);
+	play(7,0,1,1024);
+	nop();
+}
+
+
 
 void majscore(int sc)
 {
@@ -201,14 +237,17 @@ void majscore(int sc)
 		
 	APlot(31,8,5,1);
 	AdvancedPrint(33,8," SCORE  ");		
-	APlot(31,10,5,1);
-	APlot(31,11,5,1);	
-	APlot(32,10,10,1);
-	APlot(32,11,10,1);
-	AdvancedPrint(33,10,"       ");
+	APlot(31,11,5,1);
+//	APlot(31,10,5,1);
+//	APlot(31,11,5,1);	
+//	APlot(32,10,10,1);
+//	APlot(32,11,10,1);
 	AdvancedPrint(33,11,"       ");
-	AdvancedPrint(33,10,score);
+//	AdvancedPrint(33,10,"       ");
+//	AdvancedPrint(33,11,"       ");
 	AdvancedPrint(33,11,score);
+//	AdvancedPrint(33,10,score);
+//	AdvancedPrint(33,11,score);
 	nop();
 }
 //Gestion de la grille
@@ -282,6 +321,8 @@ void checkplot(scr)
 		if(scr){
 			majscore(scoretmp);
 		}
+		if(scoretmp<5) {music1();} else if(scoretmp <8) {music2() ;} else if(scoretmp <10){music3() ;} else {explode();}
+		
 		//clignotement
 		for(x=0;x<MAX_X;x++){
 			for(y=0;y<MAX_Y;y++){
@@ -490,7 +531,8 @@ void main()
 		APlot(31,8,3,1);APlot(31,9,3,1);APlot(31,10,3,1);APlot(31,11,3,1);
 		AdvancedPrint(32,9, "  FINAL  ");	
 		AdvancedPrint(32,15," APPUYEZ ");	
-		AdvancedPrint(32,16,"1 TOUCHE ");	
+		AdvancedPrint(32,16," SUR UNE ");	
+		AdvancedPrint(32,17,"  TOUCHE ");	
 		get();
 		accueil();
 	}
