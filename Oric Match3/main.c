@@ -12,6 +12,7 @@
 void AdvancedPrint(int,int,char*);
 void APlot(int,int,char,int);
 short rand124();
+short testmem(void *,short);
 void delai(char i);
 void CG_DEFCHAR();
 
@@ -169,9 +170,9 @@ void afftheend(int zto)
 
 void afftitre()
 {
-	APlot(31  ,4  ,7,1); /*APlot(32  ,2  ,10,1); */ AdvancedPrint(33,4  ," ORIC"); APlot(38  ,4  ,6,1); APlot(39  ,4  ,126,1);
+	APlot(31  ,4  ,6,1); /*APlot(32  ,2  ,10,1); */ AdvancedPrint(33,4  ," ORIC"); APlot(38  ,4  ,126,1); 
 //	APlot(31  ,3  ,7,1); APlot(32  ,3  ,10,1); AdvancedPrint(33,3  ," ORIC"); APlot(38  ,3  ,6,1); APlot(39  ,3  ,126,1);
-	APlot(31  ,5  ,7,1); /*APlot(32  ,4  ,10,1); */ AdvancedPrint(33,5  ," JEWEL ");
+	APlot(31  ,5  ,6,1); /*APlot(32  ,4  ,10,1); */ AdvancedPrint(33,5  ," JEWEL ");
 //	APlot(31  ,5  ,7,1); APlot(32  ,5  ,10,1); AdvancedPrint(33,5  ," JEWEL ");
 	nop();
 }
@@ -311,6 +312,7 @@ void checkplot(scr)
 
 	}
 	if(scoretmp>0){
+		if(scoretmp<5) {music1();} else if(scoretmp <8) {music2() ;} else if(scoretmp <10){music3() ;} else {explode();}
 		if(select==1||permut==1){
 			select=0;
 			permut=0;
@@ -321,7 +323,6 @@ void checkplot(scr)
 		if(scr){
 			majscore(scoretmp);
 		}
-		if(scoretmp<5) {music1();} else if(scoretmp <8) {music2() ;} else if(scoretmp <10){music3() ;} else {explode();}
 		
 		//clignotement
 		for(x=0;x<MAX_X;x++){
@@ -384,11 +385,12 @@ void checkplot(scr)
 
 void fil()
 {
-	short x, y, r, z;
-	for(x=0;x<MAX_X;x++)
-	{
-		for(y=7;y>0;y--)
-		{
+	short x, y, r, z, t;
+	
+	z=1;
+	while(z){
+		for(x=0;x<MAX_X;x++)
+		{			
 			if(grid[x][0]==0)
 			{
 				while(grid[x][0] == 0){
@@ -397,17 +399,23 @@ void fil()
 				plout(x,0,grid[x][0],0);
 				moveok = 1;
 			}
-			if(grid[x][y]==0)
+			for(y=7;y>0;y--)
 			{
-				moveok = 1;
-				z=y-1;
-				while (grid[x][z]==0) z--;
-				grid[x][y] = grid[x][z];
-				plout( x , y  , grid[x][y] , 0 );
-				grid[x][z]=0;
+				if(grid[x][y]==0)
+				{
+					moveok = 1;
+					grid[x][y] = grid[x][y-1];
+					grid[x][y-1]=0;
+					plout( x , y  , grid[x][y] , 0 );
+					plout( x , y-1  , 0 , 0 );
+				}
+				
+				delai(1);
+
 			}
 		}
-	}
+		z=testmem(grid,64);
+	}	
 	if(moveok ==1){
 		plout( selx , sely  , grid[selx][sely] , 0 );
 		plout( px , py  , grid[px][py] , 0 );
