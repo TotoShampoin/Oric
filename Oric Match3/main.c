@@ -73,7 +73,6 @@ void plout(int pltx,int plty,int gem,int inv)
 
 void animateaccueil(){
 	short j;
-	if (ani==0)ani=1;
 	for(j=1;j<10;j++){
 		APlot(2+x0,j+y0,ani,1);
 		ani++; if(ani>7)ani=1;
@@ -432,7 +431,6 @@ void fil()
 					moveok = 1;
 					grid[x][y] = grid[x][y-1];
 					grid[x][y-1]=0;
-					
 					if(grid[x][y]!=0){
 						plout( x , y  , grid[x][y] , 0 );
 						plout( x , y-1  , 0 , 0 );
