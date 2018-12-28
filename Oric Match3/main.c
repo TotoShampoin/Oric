@@ -24,6 +24,7 @@ short pos[2] = {0,0};		// x, y
 char score[] = "0000000";
 int scoadd;
 short px,py;
+short ani=0;
 
 short k,moveok;
 short selx,sely,difx,dify, perx,pery, temp0,select, permut;
@@ -70,10 +71,21 @@ void plout(int pltx,int plty,int gem,int inv)
 	nop();
 }
 
+void animateaccueil(){
+	short j;
+	if (ani==0)ani=1;
+	for(j=1;j<10;j++){
+		APlot(2+x0,j+y0,ani,1);
+		ani++; if(ani>7)ani=1;
+	}
+	
+}
 void accueil()
 {
 	int p,y,qsd;
+	char nokey;
 	cls();
+	ani=0;
 	
 	p=0xBB80;
 	for(y=0;y<14;y++)
@@ -91,10 +103,10 @@ void accueil()
 	 AdvancedPrint(3+x0,2+y0,"b b UdJ  b  b   QRS");APlot(18+x0,2+y0,6,1);
 	 AdvancedPrint(3+x0,3+y0,"b b  eT  b  b   [ ]");APlot(7 +x0,3+y0,95,1);APlot(18+x0,3+y0,6,1);APlot(20+x0,3+y0,92,1);
 	 AdvancedPrint(3+x0,4+y0,"KcL W W NZM KcL  f ");APlot(18+x0,4+y0,6,1);
-	 AdvancedPrint(3+x0,5+y0,"  X EaC X X EaC X  ");
-	 AdvancedPrint(3+x0,6+y0,"  b Ud^ b b Ud^ b  ");
-	 AdvancedPrint(3+x0,7+y0,"  b  eh bXb  eh b  ");APlot(7+x0,7+y0,95,1);APlot(15+x0,7+y0,95,1);
-	 AdvancedPrint(3+x0,8+y0,"KcL OcM OZP OcM OcM");
+	 AdvancedPrint(3+x0,6+y0,"  X EaC X X EaC X  ");
+	 AdvancedPrint(3+x0,7+y0,"  b Ud^ b b Ud^ b  ");
+	 AdvancedPrint(3+x0,8+y0,"  b  eh bXb  eh b  ");APlot(7+x0,8+y0,95,1);APlot(15+x0,8+y0,95,1);
+	 AdvancedPrint(3+x0,9+y0,"KcL OcM OZP OcM OcM");
 	for(qsd = 3;qsd<40;qsd++){
 		APlot(qsd,14 ,'"',1);
 	}
@@ -103,12 +115,19 @@ void accueil()
 	AdvancedPrint(3,20,"   ESCAPE SI PAS DE SOLUTION : FIN ");
 	AdvancedPrint(3,22,"  APPUYEZ SUR UNE TOUCHE POUR JOUER");
 	AdvancedPrint(3,24,"     Q POUR QUITTER MAINTENANT");
-		
-	kr=get();
-	if(kr=='Q'){
-		newgame=0;
-	} else {
-		newgame=1;
+	nokey = 1;
+	while(nokey){
+		kr=key();
+		if(kr!=0){
+			if(kr=='Q'){
+				newgame=0;
+			} else {
+				newgame=1;
+			}
+			nokey = 0;
+		}else{
+			animateaccueil();
+		}
 	}
 	nop();
 	
