@@ -432,11 +432,8 @@ void fil()
 					moveok = 1;
 					grid[x][y] = grid[x][y-1];
 					grid[x][y-1]=0;
-					
-					if(grid[x][y]!=0){
-						plout( x , y  , grid[x][y] , 0 );
-						plout( x , y-1  , 0 , 0 );
-					}
+					plout( x , y  , grid[x][y] , 0 );
+					plout( x , y-1  , 0 , 0 );
 				}
 			}
 		}
