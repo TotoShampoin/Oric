@@ -22,7 +22,7 @@ short grid2[MAX_X][MAX_Y];
 
 short pos[2] = {0,0};		// x, y
 char score[] = "0000000";
-
+int scoadd;
 short px,py;
 
 short k,moveok;
@@ -48,7 +48,7 @@ void debug(char *s){
 		aff = itoa(compteur); 
 		AdvancedPrint(0,0,aff); 
 		AdvancedPrint(5,0,s); 
-		get();
+
 }
 
 //Affichage
@@ -181,7 +181,7 @@ void music1(){
 	music(1,2,12,0);
 	music(2,4,4,0);
 	music(3,4,7,0);
-	play(7,0,1,1024);
+	play(7,0,1,1512);
 	nop();
 }
 
@@ -189,7 +189,7 @@ void music2(){
 	music(1,3,12,0);
 	music(2,5,4,0);
 	music(3,5,7,0);
-	play(7,0,1,1024);
+	play(7,0,1,1512);
 	nop();
 }
 
@@ -197,7 +197,7 @@ void music3(){
 	music(1,4,12,0);
 	music(2,6,4,0);
 	music(3,5,7,0);
-	play(7,0,1,1024);
+	play(7,0,1,1512);
 	nop();
 }
 
@@ -211,7 +211,8 @@ void majscore(int sc)
 	char *sctmp;
 	
 	m=0;n=0;
-	scrtmp = (sc*sc) ; //valeur ASC de 0 : 48
+	scrtmp = (sc*sc*sc) + scoadd; 
+	scoadd = scrtmp;
 	sctmp = itoa(scrtmp);
 	retenue = 0;
 	l=6;
@@ -273,6 +274,7 @@ void checkplot(scr)
 						grid2[x-a][y]=1;
 					}
 					scoretmp += align;
+					if(grid[x-1][y]==7)scoretmp += 2;
 				}
 				align=1;
 			}
@@ -298,6 +300,7 @@ void checkplot(scr)
 					for(a=1;a<=align;a++)
 						{grid2[x][y-a]=1;}
 					scoretmp += align;
+					if(grid[x][y-1]==7)scoretmp += 2;
 				}
 				align=1;
 			}
@@ -367,6 +370,7 @@ void checkplot(scr)
 		}
 	} else {
 		if(permut==1){
+			shoot();
 			temp0 = grid[px][py];
 			grid[px][py] = grid[selx][sely]; 
 			plout( px , py  , grid[px][py] , 0 );
@@ -393,12 +397,15 @@ void fil()
 		{			
 			if(grid[x][0]==0)
 			{
-				while(grid[x][0] == 0){
+				while(grid[x][0] == 0 || (grid[x][0]) == 7 && score[2]==48 ){
 					grid[x][0]=rand124(); 
 				}
 				plout(x,0,grid[x][0],0);
 				moveok = 1;
 			}
+		}
+		for(x=0;x<MAX_X;x++)
+		{			
 			for(y=7;y>0;y--)
 			{
 				if(grid[x][y]==0)
@@ -409,9 +416,6 @@ void fil()
 					plout( x , y  , grid[x][y] , 0 );
 					plout( x , y-1  , 0 , 0 );
 				}
-				
-				delai(1);
-
 			}
 		}
 		z=testmem(grid,64);
@@ -528,6 +532,7 @@ void main()
 		fil();
 		contpartie = 1;
 		while(contpartie){
+			scoadd = 0;
 			do{
 				moveok=0;
 				checkplot(1);
