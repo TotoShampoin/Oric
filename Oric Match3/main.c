@@ -13,7 +13,7 @@ void AdvancedPrint(int,int,char*);
 void APlot(int,int,char,int);
 short rand124();
 short testmem(void *,short);
-void delai(char i);
+void delai(char );
 void CG_DEFCHAR();
 void setanimate(int,int);
 void unsetanimate();
@@ -35,6 +35,8 @@ int tpx, tpy;
 int calc1, calc2;
 int iwait,contpartie,newgame;
 char kr;
+int diamant;
+int soun;
 
 unsigned int compteur=0;
 char *aff  ="        ";
@@ -58,7 +60,7 @@ void debug(char *s){
 void plout(int pltx,int plty,int gem,int inv)
 {
 	int ge4;
-	tpx = 4+pltx*3; 
+	tpx = 2+pltx*3; 
 	tpy = 3+plty*3;
 	if(gem==0)
 	{
@@ -111,6 +113,8 @@ void accueil()
 	AdvancedPrint(2,20,"SI PAS DE SOLUTION : ESCAPE POUR FINIR");
 	AdvancedPrint(2,22,"  APPUIE SUR UNE TOUCHE POUR JOUER");
 	AdvancedPrint(2,24,"     Q POUR QUITTER MAINTENANT");
+	AdvancedPrint(2,26,"  S SON ON OFF   D DIAMANT ON OFF");
+	APlot(5,26 ,'"',1);APlot(12,26,'$',1);APlot(17,26 ,'"',1);APlot(31,26 ,'$',1);
 	nokey = 1;
 	while(nokey){
 		kr=key();
@@ -131,18 +135,18 @@ void accueil()
 void afftour()
 {
 	int qsd;
-	APlot(2  , 1  , '!' ,1 ); 
-	APlot(2  , 27 , '%' ,1 ); 
-	APlot(30 , 1  , '#' ,1 ); 
-	APlot(30 , 27 , '&' ,1 ); 
-	APlot(29 , 1  , 7   ,1 ); 
-	APlot(29 , 27 , 7   ,1 ); 
+	APlot(0  , 1  , '!' ,1 ); 
+	APlot(0  , 27 , '%' ,1 ); 
+	APlot(28 , 1  , '#' ,1 ); 
+	APlot(28 , 27 , '&' ,1 ); 
+	APlot(27 , 1  , 7   ,1 ); 
+	APlot(27 , 27 , 7   ,1 ); 
 	for(qsd = 2;qsd<27;qsd++){
-		APlot(2 ,qsd,'$',1);
-		APlot(29 , qsd  , 7   ,1 ); 
-		APlot(30,qsd,'$',1);
+		APlot(0  , qsd ,'$' ,1);
+		APlot(27 , qsd , 7  ,1 ); 
+		APlot(28 , qsd ,'$' ,1);
 	}
-	for(qsd = 3;qsd<30;qsd++){
+	for(qsd = 1;qsd<28;qsd++){
 		APlot(qsd,1 ,'"',1);
 		APlot(qsd,27,'"',1);
 	}
@@ -151,7 +155,7 @@ void afftour()
 }
 void affcurs(int pltx,int plty)
 {
-	tpx = 4+pltx*3; 
+	tpx = 2+pltx*3; 
 	tpy = 2+plty*3;
 	APlot(tpx   , tpy   , '!' ,1 ); 
 	APlot(tpx   , tpy+3 , '%' ,1 ); 
@@ -162,7 +166,7 @@ void affcurs(int pltx,int plty)
 
 void effcurs(int pltx,int plty)
 {
-	tpx = 4+pltx*3; 
+	tpx = 2+pltx*3; 
 	tpy = 2+plty*3;
 	APlot(tpx   , tpy   , 32 ,1 ); 
 	APlot(tpx   , tpy+3 , 32 ,1 ); 
@@ -173,29 +177,30 @@ void effcurs(int pltx,int plty)
 
 void afftheend(int zto)
 {
-	tpx = 4+10*3; 
+	tpx = 2+10*3; 
 	tpy = 2+6*3;
 	APlot(tpx  ,tpy  ,zto,1); AdvancedPrint(tpx+1,tpy  ,"*+,");
 	APlot(tpx  ,tpy+1,zto,1); AdvancedPrint(tpx+1,tpy+1,"-./");
 	APlot(tpx  ,tpy+2,zto,1); AdvancedPrint(tpx+1,tpy+2,"<=>");
-	APlot(31  ,tpy+4,zto,1); APlot(31  ,tpy+5,zto,1); 
+	APlot(29   ,tpy+4,zto,1); APlot(29  ,tpy+5,zto,1); 
 	if(zto==7){
-		AdvancedPrint(32,tpy+4,"   ESC  ");
-		AdvancedPrint(32,tpy+5,"        ");
+		AdvancedPrint(30,tpy+4,"   ESC  ");
+		AdvancedPrint(30,tpy+5,"        ");
 	}else{
-		AdvancedPrint(32,tpy+4,"CONFIRME");
-		AdvancedPrint(32,tpy+5," TAPE O ");
+		AdvancedPrint(30,tpy+4," CONFIRME");
+		AdvancedPrint(30,tpy+5,"  TAPE O ");
 	}
 	nop();
 }
 
-void afftitre()
-{
-	APlot(31  ,4  ,6,1); /*APlot(32  ,2  ,10,1); */ AdvancedPrint(32,4  ,"ORIC "); APlot(37  ,4  ,10,1); APlot(39  ,4  ,126,1); 
-//	APlot(31  ,3  ,7,1); APlot(32  ,3  ,10,1); AdvancedPrint(33,3  ," ORIC"); APlot(38  ,3  ,6,1); APlot(39  ,3  ,126,1);
-	APlot(31  ,5  ,6,1); /*APlot(32  ,4  ,10,1); */ AdvancedPrint(32,5  ,"JEWEL");APlot(37  ,5  ,10,1);APlot(39  ,5 ,126,1); 
-//	APlot(31  ,5  ,7,1); APlot(32  ,5  ,10,1); AdvancedPrint(33,5  ," JEWEL ");
-	setanimate(0xBB80+4*40+38,2);
+void afftitre(){
+	APlot(29  ,2  ,10,1);   APlot(30  ,2   ,10,1);  AdvancedPrint(30,2   ,"O R I C "); APlot(37  ,2   ,10,1); APlot(38  ,2   ,126,1); 
+	APlot(29  ,3  ,10,1);   APlot(30  ,3   ,10,1);  AdvancedPrint(30,3   ,"O R I C "); APlot(38  ,3   ,6,1);  APlot(38  ,3   ,126,1);
+	if(diamant) {
+		setanimate( 0xBB80+2*40+37 , 2 );
+	}
+	APlot(29  ,4  ,10,1);   APlot(30  ,4  ,10,1);  AdvancedPrint(30,4  ,"J E W E L");
+	APlot(29  ,5  ,10,1);   APlot(30  ,5  ,10,1);  AdvancedPrint(30,5  ,"J E W E L");
 	
 	nop();
 }
@@ -260,19 +265,12 @@ void majscore(int sc)
 		l--;
 	}
 		
-	APlot(31,8,5,1);
-	AdvancedPrint(33,8," SCORE  ");		
-	APlot(31,11,5,1);
-//	APlot(31,10,5,1);
-//	APlot(31,11,5,1);	
-//	APlot(32,10,10,1);
-//	APlot(32,11,10,1);
-	AdvancedPrint(33,11,"       ");
-//	AdvancedPrint(33,10,"       ");
-//	AdvancedPrint(33,11,"       ");
-	AdvancedPrint(33,11,score);
-//	AdvancedPrint(33,10,score);
-//	AdvancedPrint(33,11,score);
+	APlot(29,8,5,1);
+	AdvancedPrint(30,8,"  SCORE  ");		
+	APlot(29,11,5,1);
+
+	AdvancedPrint(30,11,"         ");
+	AdvancedPrint(31,11,score);
 	nop();
 }
 //Gestion de la grille
@@ -338,7 +336,9 @@ void checkplot(scr)
 
 	}
 	if(scoretmp>0){
-		if(scoretmp<5) {music1();} else if(scoretmp <8) {music2() ;} else if(scoretmp <10){music3() ;} else {explode();}
+		if(soun){
+			if(scoretmp<5) {music1();} else if(scoretmp <8) {music2() ;} else if(scoretmp <10){music3() ;} else {explode();}
+		}
 		if(select==1||permut==1){
 			select=0;
 			permut=0;
@@ -512,6 +512,15 @@ void control(){
 				plout( selx , sely  , grid[selx][sely] , 0 );
 			}
 		}
+	} else	if( k== 'S' ) {
+		soun = 1-soun;
+	} else 	if( k== 'D' ) {
+		diamant = 1-diamant;
+		if(diamant){
+			setanimate(0xBB80+2*40+37,2);
+		} else {
+			unsetanimate();
+		}
 	}
 	nop();
 } 
@@ -525,6 +534,8 @@ void main()
 	unsigned short i;
 	int ticks;
 	
+	diamant=1;
+	soun=1;
 	sauv1 = peek(0x24E);
 	sauv2 = peek(0x24F);
 	sauv3 = peek(0xBB80+35);
@@ -566,11 +577,11 @@ void main()
 			control();
 			nop();
 		}
-		APlot(31,8,3,1);APlot(31,9,3,1);APlot(31,10,3,1);APlot(31,11,3,1);
-		AdvancedPrint(32,9, "  FINAL  ");	
-		AdvancedPrint(32,15," APPUYEZ ");	
-		AdvancedPrint(32,16," SUR UNE ");	
-		AdvancedPrint(32,17,"  TOUCHE ");	
+		APlot(29,8,3,1);APlot(29,9,3,1);APlot(29,10,3,1);APlot(29,11,3,1);
+		AdvancedPrint(30,9, "  FINAL  ");	
+		AdvancedPrint(30,15,"  APPUIE ");	
+		AdvancedPrint(30,16," SUR  UNE ");	
+		AdvancedPrint(30,17,"  TOUCHE ");	
 		get();
 		unsetanimate();
 		accueil();
