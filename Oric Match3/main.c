@@ -15,6 +15,8 @@ short rand124();
 short testmem(void *,short);
 void delai(char i);
 void CG_DEFCHAR();
+void setanimate(int,int);
+void unsetanimate();
 
 //Variables
 short grid[MAX_X][MAX_Y];
@@ -71,14 +73,7 @@ void plout(int pltx,int plty,int gem,int inv)
 	nop();
 }
 
-void animateaccueil(){
-	short j;
-	for(j=1;j<10;j++){
-		APlot(2+x0,j+y0,ani,1);
-		ani++; if(ani>7)ani=1;
-	}
-	
-}
+
 void accueil()
 {
 	int p,y,qsd;
@@ -98,22 +93,24 @@ void accueil()
 		p=p+40;
 	}
 	
-	 AdvancedPrint(3+x0,1+y0,"AaB EaB DYC AaB GHI");APlot(18+x0,1+y0,6,1);
-	 AdvancedPrint(3+x0,2+y0,"b b UdJ  b  b   QRS");APlot(18+x0,2+y0,6,1);
-	 AdvancedPrint(3+x0,3+y0,"b b  eT  b  b   [ ]");APlot(7 +x0,3+y0,95,1);APlot(18+x0,3+y0,6,1);APlot(20+x0,3+y0,92,1);
-	 AdvancedPrint(3+x0,4+y0,"KcL W W NZM KcL  f ");APlot(18+x0,4+y0,6,1);
-	 AdvancedPrint(3+x0,6+y0,"  X EaC X X EaC X  ");
-	 AdvancedPrint(3+x0,7+y0,"  b Ud^ b b Ud^ b  ");
-	 AdvancedPrint(3+x0,8+y0,"  b  eh bXb  eh b  ");APlot(7+x0,8+y0,95,1);APlot(15+x0,8+y0,95,1);
-	 AdvancedPrint(3+x0,9+y0,"KcL OcM OZP OcM OcM");
-	for(qsd = 3;qsd<40;qsd++){
+	AdvancedPrint(2+x0,1+y0,"AaB EaB DYC AaB GHI");
+	AdvancedPrint(2+x0,2+y0,"b b UdJ  b  b   QRS");
+	AdvancedPrint(2+x0,3+y0,"b b  eT  b  b   [ ]");APlot(6 +x0,3+y0,95,1);;APlot(19+x0,3+y0,92,1);
+	AdvancedPrint(2+x0,4+y0,"KcL W W NZM KcL  f ");
+	setanimate(0xBB80+(1+y0)*40+17+x0,4);
+	
+	AdvancedPrint(2+x0,6+y0,"  X EaC X X EaC X  ");
+	AdvancedPrint(2+x0,7+y0,"  b Ud^ b b Ud^ b  ");
+	AdvancedPrint(2+x0,8+y0,"  b  eh bXb  eh b  ");APlot(6+x0,8+y0,95,1);APlot(14+x0,8+y0,95,1);
+	AdvancedPrint(2+x0,9+y0,"KcL OcM OZP OcM OcM");
+	for(qsd = 2;qsd<40;qsd++){
 		APlot(qsd,14 ,'"',1);
 	}
-	AdvancedPrint(3,16,"UTILISER LES FLECHES POUR SE DEPLACER");
-	AdvancedPrint(3,18,"       ESPACE POUR PERMUTER");
-	AdvancedPrint(3,20,"   ESCAPE SI PAS DE SOLUTION : FIN ");
-	AdvancedPrint(3,22,"  APPUYEZ SUR UNE TOUCHE POUR JOUER");
-	AdvancedPrint(3,24,"     Q POUR QUITTER MAINTENANT");
+	AdvancedPrint(2,16,"UTILISE LES FLECHES POUR  TE  DEPLACER");
+	AdvancedPrint(2,18,"       ESPACE POUR PERMUTER");
+	AdvancedPrint(2,20,"SI PAS DE SOLUTION : ESCAPE POUR FINIR");
+	AdvancedPrint(2,22,"  APPUIE SUR UNE TOUCHE POUR JOUER");
+	AdvancedPrint(2,24,"     Q POUR QUITTER MAINTENANT");
 	nokey = 1;
 	while(nokey){
 		kr=key();
@@ -124,10 +121,9 @@ void accueil()
 				newgame=1;
 			}
 			nokey = 0;
-		}else{
-			animateaccueil();
 		}
 	}
+	unsetanimate();
 	nop();
 	
 }
@@ -182,16 +178,25 @@ void afftheend(int zto)
 	APlot(tpx  ,tpy  ,zto,1); AdvancedPrint(tpx+1,tpy  ,"*+,");
 	APlot(tpx  ,tpy+1,zto,1); AdvancedPrint(tpx+1,tpy+1,"-./");
 	APlot(tpx  ,tpy+2,zto,1); AdvancedPrint(tpx+1,tpy+2,"<=>");
-	APlot(31  ,tpy+4,7,1); AdvancedPrint(34,tpy+4,"ESC O");
+	APlot(31  ,tpy+4,zto,1); APlot(31  ,tpy+5,zto,1); 
+	if(zto==7){
+		AdvancedPrint(32,tpy+4,"   ESC  ");
+		AdvancedPrint(32,tpy+5,"        ");
+	}else{
+		AdvancedPrint(32,tpy+4,"CONFIRME");
+		AdvancedPrint(32,tpy+5," TAPE O ");
+	}
 	nop();
 }
 
 void afftitre()
 {
-	APlot(31  ,4  ,6,1); /*APlot(32  ,2  ,10,1); */ AdvancedPrint(33,4  ," ORIC"); APlot(38  ,4  ,126,1); 
+	APlot(31  ,4  ,6,1); /*APlot(32  ,2  ,10,1); */ AdvancedPrint(32,4  ,"ORIC "); APlot(37  ,4  ,10,1); APlot(39  ,4  ,126,1); 
 //	APlot(31  ,3  ,7,1); APlot(32  ,3  ,10,1); AdvancedPrint(33,3  ," ORIC"); APlot(38  ,3  ,6,1); APlot(39  ,3  ,126,1);
-	APlot(31  ,5  ,6,1); /*APlot(32  ,4  ,10,1); */ AdvancedPrint(33,5  ," JEWEL ");
+	APlot(31  ,5  ,6,1); /*APlot(32  ,4  ,10,1); */ AdvancedPrint(32,5  ,"JEWEL");APlot(37  ,5  ,10,1);APlot(39  ,5 ,126,1); 
 //	APlot(31  ,5  ,7,1); APlot(32  ,5  ,10,1); AdvancedPrint(33,5  ," JEWEL ");
+	setanimate(0xBB80+4*40+38,2);
+	
 	nop();
 }
 
@@ -457,7 +462,7 @@ void control(){
 	} else 	if( k == 27 ) { 
 		afftheend(1);
 		k=get();
-		while( k!=27 && k!='O' && k!='N' ){
+		while( k!=27 && k!='O' && k!='N'){
 			k=get();
 		}
 		if( k == 27 || k=='N' ){
@@ -567,6 +572,7 @@ void main()
 		AdvancedPrint(32,16," SUR UNE ");	
 		AdvancedPrint(32,17,"  TOUCHE ");	
 		get();
+		unsetanimate();
 		accueil();
 	}
 	cls();
