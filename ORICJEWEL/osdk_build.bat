@@ -18,6 +18,15 @@ CALL osdk_config.bat
 :: Launch the compilation of files
 ::
 CALL %OSDK%\bin\make.bat %OSDKFILE%
+
+ECHO Building DSK file
+%OSDK%\bin\tap2dsk build\%OSDKNAME%.TAP build\%OSDKNAME%.dsk
+%OSDK%\bin\old2mfm build\%OSDKNAME%.dsk
+
+ECHO Copying to tapes directory of Oricutron
+
+copy build\%OSDKNAME%.TAP ..\..\Oricutron\Tapes
+copy build\symbols ..\..\Oricutron
 GOTO End
 
 
@@ -33,4 +42,3 @@ GOTO End
 
 
 :End
-pause
