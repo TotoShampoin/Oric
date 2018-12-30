@@ -108,12 +108,12 @@ void accueil()
 	for(qsd = 2;qsd<40;qsd++){
 		APlot(qsd,14 ,'"',1);
 	}
-	AdvancedPrint(2,16,"   UTILISE IJKL POUR  TE  DEPLACER");
-	AdvancedPrint(2,18,"     A POUR PERMUTER DEUX GEMMES");
-	AdvancedPrint(2,20,"SI PAS DE SOLUTION : ESCAPE POUR FINIR");
-	AdvancedPrint(2,22,"  APPUIE SUR UNE TOUCHE POUR JOUER");
-	AdvancedPrint(2,24,"     Q POUR QUITTER MAINTENANT");
-	AdvancedPrint(2,26,"  S SON ON OFF   D DIAMANT ON OFF");
+	AdvancedPrint(2,16,"   UTILISE IJKL POUR  TE  DEPLACER");APlot(12,16,2,1);APlot(17,16,7,1);
+	AdvancedPrint(2,18,"     A POUR PERMUTER DEUX GEMMES");APlot(6,18,2,1);APlot(8,18,7,1);
+	AdvancedPrint(2,20,"SI PAS DE SOLUTION : ESCAPE POUR FINIR");APlot(22,20,1,1);APlot(29,20,7,1);
+	AdvancedPrint(2,22,"  APPUIE SUR UNE TOUCHE POUR JOUER");APlot(14,22,4,1);APlot(25,22,7,1);
+	AdvancedPrint(2,24,"     Q POUR QUITTER MAINTENANT");APlot(6,24,2,1);APlot(8,24,7,1);
+	AdvancedPrint(2,26,"  S SON ON OFF   D DIAMANT ON OFF");APlot(2,26,6,1);APlot(5,26,7,1);APlot(18,26,6,1);APlot(20,26,7,1);
 	APlot(12,26,'$',1);APlot(17,26 ,'"',1);APlot(31,26 ,'$',1);
 	nokey = 1;
 	while(nokey){
@@ -346,7 +346,10 @@ void checkplot(scr)
 		if(scr){
 			majscore(scoretmp);
 		}
-		
+		if(soun){
+			if(scoretmp<5) {music1();} else if(scoretmp <8) {music2() ;} else if(scoretmp <10){music3() ;} else {explode();}
+		}
+
 		//clignotement
 		for(x=0;x<MAX_X;x++){
 			for(y=0;y<MAX_Y;y++){
@@ -388,13 +391,10 @@ void checkplot(scr)
 				}
 			}
 		}
-		if(soun){
-			if(scoretmp<5) {music1();} else if(scoretmp <8) {music2() ;} else if(scoretmp <10){music3() ;} else {explode();}
-		}
 
 	} else {
 		if(permut==1){
-			shoot();
+			if(soun)shoot();
 			temp0 = grid[px][py];
 			grid[px][py] = grid[selx][sely]; 
 			plout( px , py  , grid[px][py] , 0 );
