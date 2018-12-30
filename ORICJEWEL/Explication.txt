@@ -1,0 +1,208 @@
+Pour créer ce jeu, nous sommes partis d'un programme développé par Toto sur sa calculatrice HP Prime. C'était rudimentaire, mais les bases de l'algorithme pour trouver les alignements et faire tomber les bijoux étaient écrites. Il a alors commencé à en faire le portage pour l'ORIC. C'était le 21 décembre. Mais il n'arrivait pas à reproduire les effets qu'il voulait.
+
+J'ai pris le relais sur le code le 25 décembre, car j'étais seul le jour de Noël. J'aurais pu aller dans ma famille mais je préférais me reposer. Pendant ce temps, Toto paufinait les sprites, la police de caractères, l'aspect général du jeu.
+
+Je voulais vous commenter l'animation du Diamant qui clignote pour donner un effet de brillance. Pour cela, nous avons créer des petites routines en assembleur qui sont appelables depuis le programme écrit en C et qui exploitent l'interruption. C'est d'une simplicité enfantine. Je n'ai pas creusé les fonctions proposées par la LIB OSDK pour les interruptions car je n'ai pas compris comment les utiliser et ça me paraissait lourd pour ce que j'avais à faire. Là, c'est tout simple et dédié à cette utilisation : on passe des paramètres sur ce qui va être exécuté ce qui fait que la routine est utilisée pour l'écran de titre et pour l'écran de jeu. on pourrait imaginer aussi avoir des gemmes magiques dans le jeu et qui scintillent.
+
+setanimate(adresse écran, nombre de lignes)
+la fonction va mémoriser l'adresse d'une petite colonne de l'écran d'une hauteur que l'on passe également en paramètre. A chaque fois qu'une interruption intervient, la routine va changer la couleur de ces octets.
+On prend soin de sauvegarder le vecteur d'interruption précédent (par défaut l'instruction RTI). On pourrait même continuer à l'appeler après notre routine d'affichage pour faire d'autres tâches.
+Attention : on ne peut appeler la fonction qu'une fois. Il faut nécessairement appeler unsetanimate si on veut animer une autre partie de l'écran. Pour animer plusieur zones, il faut revoir le programme ASM. Il n'y a aucun contrôle de mauvaise utilisation de la fonction.
+
+unsetanimate()
+restore l'affectation initiale du vecteur d'interruption.
+
+;;; valeur de l'attribut de couleur à afficher. La routine va faire tourner cette valeur de 7 à 1
+color
+.dsb 1
+
+;;; nombre de lignes sur lesquelles changer l'attribut de couleur
+nblignes
+.dsb 1
+
+;; vecteur d'interruption initial.
+saverti
+.dsb 3
+
+;;; Adresse de l'écran à partir de laquelle on change la couleur (première ligne de la colonne)
+ADDRSCRN
+.dsb 2
+
+
+;;; La routine appelée par l'interruption
+_animate
+.(
+;;; par précaution, on sauvegarde les registres. Pas certain que tout soit utile
+	pha
+	txa
+	pha
+	php
+
+;;; on récupère l'adresse de l'écran, que l'on recopie dans la routine. Ca va être notre zone de travail
+	lda ADDRSCRN
+	sta locaddr+1
+	lda ADDRSCRN+1
+	sta locaddr+2
+
+;;; on initialise le compteur de lignes	
+	ldx nblignes
+
+;;; on change la couleur
+	dec color
+	lda color
+	bne suite
+;;; que l'on fait tourner (on revient à 7)
+	lda #7
+	sta color
+
+suite
+	lda color
+locaddr
+;;; on change la couleur de la zone $1234 (modifiée par la recopie ci=dessus)
+	sta $1234
+;;; on incrémente de 40 cases, ce qui revient à passer à la ligne suivante
+	lda #40
+	clc
+	adc locaddr+1
+	sta locaddr+1
+	lda locaddr+2
+	adc #0
+	sta locaddr+2
+	dex
+;;; on boucle en décrémentant x jusqu'à 0 
+	bne suite
+	
+;;; on restore les registres
+	plp
+	pla
+	tax
+	pla
+;;; fin de l'interruption. On peut remplacer rti par un JMP à l'ancienne valeur du vecteur d'interruption
+	rti
+.)
+
+
+;;;; C'est cette fonction qu'on appelle depuis le C
+_setanimate
+.(
+;;; on récupère les arguments : ADDR et nblignes et on initialise nos variables
+	
+	ldy #0
+	lda (sp),y
+	sta ADDRSCRN
+	iny
+	lda (sp),y
+	sta ADDRSCRN+1
+	
+	iny
+	lda (sp),y
+	sta nblignes
+
+	lda #7
+	sta color
+
+;;; On bloque les interruptions pour éviter de s'en prendre une alors qu'on est en train de changer le vecteur d'interruption. Ca peut faire crasher
+	
+	sei
+;;; on initialise le vecteur d'interruption après l'avoir sauvegardé
+	lda $24A
+	sta saverti
+	lda $24B
+	sta saverti+1
+	lda $24C
+	sta saverti+2
+;;; Le vecteur d'interruption doit contenir un JMP ADDR. On met donc le code de l'instruction JMP : 4C.
+	lda #$4C
+	sta $24A
+;;; Et juste derrière, l'adresse de notre routine ANIMATE
+	lda #<_animate
+	sta $24B
+	lda #>_animate
+	sta $24C
+	cli
+	rts
+.)
+
+;;; encore plus simple : on restore juste le vecteur d'interruption
+_unsetanimate
+.(
+	sei
+	lda saverti
+	sta $24A
+	lda saverti+1
+	sta $24B
+	lda saverti+2
+	sta $24C
+	cli
+	rts
+.)
+
+
+L'autre routine que nous avons créée se substitue à une fonction de la HP prime qui causait des tracas à Toto : Matcont. C'est une fonction qui permet de savoir si une matrice contient une certaine valeur.
+
+J'ai donc créé en assembleur la même fonction : est-ce qu'une zone mémoire contient 0 ? cette fonction est appelée chaque fois qu'on complète la ligne du haut et qu'on fait descendre les gemmes. C'est grâce à cette fonction très élégante qu'on peut écrire un code très simple et aussi très élégant en C pour faire descendre les gemmes.
+
+Cette fonction ne prend pas beaucoup de cycles dans les faits car on n'a pas besoin de scanner les 64 cases du tableau à chaque fois. Dans notre jeu, s'il y a des cases libres, elles sont toujours en première ligne. Car normalement on les fait descendre à chaque tour. Donc, on ne scanne pas toute la matrice à chaque tour.
+
+_testmem
+.(
+	ldy #0
+	lda (sp),y
+	sta tmp0
+	iny
+	lda (sp),y
+	sta tmp0+1
+	
+	iny
+	lda (sp),y
+	tay
+	dey
+boucle1
+	lda (tmp0),y
+	beq zerotrouve
+	dey
+	bne boucle1
+	lda #0
+	ldx #0
+	rts
+	
+zerotrouve
+	lda #1
+	ldx #1
+	rts
+
+.)
+
+Et le programme en C pour l'appeler.
+
+	z=1;    // on boucle tant qu'on trouve du vide.
+	while(z){
+		for(x=0;x<MAX_X;x++)
+		{			
+			if(grid[x][0]==0) // On ajoute des gemmes toujours sur la première ligne
+			{
+				while(grid[x][0] == 0 || (grid[x][0]) == 7 && score[2]==48 ){
+					grid[x][0]=rand124(); // fonction Random entière qui retourne un entier entre 0 et 7. Comme on ne veut ni 0 ni 7, on les ignore dans un While. C'est bourrin mais ça marche
+				}
+				plout(x,0,grid[x][0],0); // Mega Plot de 4 caractères pour une gemme
+				moveok = 1;
+			}
+		}
+		for(x=0;x<MAX_X;x++) // on fait descendre les gemmes
+		{			
+			for(y=7;y>0;y--)
+			{
+				if(grid[x][y]==0)
+				{
+					moveok = 1;
+					grid[x][y] = grid[x][y-1];
+					grid[x][y-1]=0;
+					if(grid[x][y]!=0){
+						plout( x , y  , grid[x][y] , 0 );
+						plout( x , y-1  , 0 , 0 );
+					}
+				}
+			}
+		}
+		z=testmem(grid,64);  // on teste s'il reste du vide. La zone mémoire fait 64 octets, car grid est tableau de short.
+	}
